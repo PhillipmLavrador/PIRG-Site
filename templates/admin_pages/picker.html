@@ -13,7 +13,7 @@
   var clientId = '{{ client_id }}';
 
   // Scope to use to access user's Drive items.
-  var scope = ['https://www.googleapis.com/auth/drive.readonly'];
+  var scope = {{ scopes|tojson }};  // Read scopes from template context
 
   var pickerApiLoaded = false;
   var oauthToken;

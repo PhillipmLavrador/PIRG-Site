@@ -21,7 +21,7 @@ def google_drive_auth():
         config = json.load(f)
     flow = Flow.from_client_config(
         config,
-        scopes=['https://www.googleapis.com/auth/drive.readonly'],
+        scopes=['https://www.googleapis.com/auth/drive.readonly', 'openid'],  # Update this line
         redirect_uri='http://localhost:5000/google_drive_callback'  # Ensure this matches the Google Cloud Console
     )
     authorization_url, state = flow.authorization_url(access_type='offline', include_granted_scopes='true', prompt='consent')
@@ -34,7 +34,7 @@ def google_drive_callback():
         config = json.load(f)
     flow = Flow.from_client_config(
         config,
-        scopes=['https://www.googleapis.com/auth/drive.readonly'],
+        scopes=['https://www.googleapis.com/auth/drive.readonly', 'openid'],  # Update this line
         state=state,
         redirect_uri='http://localhost:5000/google_drive_callback'  # Ensure this matches the Google Cloud Console
     )
@@ -46,7 +46,7 @@ def google_drive_callback():
 def picker_route():
     with open(CONFIG_FILE_PATH, 'r') as f:
         config = json.load(f)
-    return render_template('admin_pages/picker.html', developer_key=config['web']['developer_key'], client_id=config['web']['client_id'])
+    return render_template('admin_pages/picker.html', developer_key=config['web']['developer_key'], client_id=config['web']['client_id'], scopes=config['web']['scopes'])
 
 def credentials_to_dict(credentials):
     return {
@@ -178,4 +178,6 @@ def select_folder_route():
     return select_folder()
 
 if __name__ == '__main__': 
+    app.run(debug=True)
+
     app.run(debug=True)

@@ -12,6 +12,11 @@
         "javascript_origins": [
             "http://localhost:5000"
         ],
-        "developer_key": "AIzaSyBXwHqsSbnXD5vtA7wIg-3t4mHdQOupGng"
+        "developer_key": "AIzaSyBXwHqsSbnXD5vtA7wIg-3t4mHdQOupGng",
+        "scopes": [
+            "https://www.googleapis.com/auth/drive.readonly",
+            "openid"
+        ]
+
     }
 }
