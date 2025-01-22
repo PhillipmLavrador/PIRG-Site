@@ -1,7 +1,7 @@
 from flask import Flask, redirect, url_for, request, session, render_template, flash, send_file, jsonify
 from models import User, DocumentModel
 from drive_search import search_files
-from google_drive import google_drive_auth, google_drive_callback, picker_route, sync_google_drive
+from google_drive import google_drive_auth, google_drive_callback, picker_route, sync_google_drive, sync_folder_route  # Update this import
 import os
 from docx import Document
 import pandas as pd
@@ -213,6 +213,11 @@ def sync_files():
         return 'Unauthorized', 403
     sync_google_drive()
     return 'Success', 200
+
+@app.route('/sync_folder', methods=['POST'])
+@csrf.exempt
+def sync_folder_route():
+    return sync_folder_route()
 
 @app.route('/google_drive_auth')
 def google_drive_auth_route():

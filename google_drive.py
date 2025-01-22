@@ -4,10 +4,11 @@ from googleapiclient.discovery import build
 import json
 import os
 import io
-from googleapiclient.http import MediaIoBaseDownload
+from googleapiclient.http import MediaIoBaseDownload, MediaFileUpload  # Add this import
 from google.oauth2 import service_account
 from docx import Document
 from fuzzywuzzy import fuzz
+from flask_wtf.csrf import CSRFProtect  # Add this import
 
 # Allow insecure transport for development
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
@@ -15,13 +16,14 @@ os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 CONFIG_FILE_PATH = 'c:/Users/phill/Desktop/PIRG Site/bin/PIRG-Site/config.json'  # Update with the actual path to the config file
 
 app = Flask(__name__)
+csrf = CSRFProtect(app)  # Initialize CSRFProtect
 
 def google_drive_auth():
     with open(CONFIG_FILE_PATH, 'r') as f:
         config = json.load(f)
     flow = Flow.from_client_config(
         config,
-        scopes=['https://www.googleapis.com/auth/drive.readonly', 'openid'],  # Update this line
+        scopes=config['web']['scopes'],  # Read scopes from config.json
         redirect_uri='http://localhost:5000/google_drive_callback'  # Ensure this matches the Google Cloud Console
     )
     authorization_url, state = flow.authorization_url(access_type='offline', include_granted_scopes='true', prompt='consent')
@@ -34,7 +36,7 @@ def google_drive_callback():
         config = json.load(f)
     flow = Flow.from_client_config(
         config,
-        scopes=['https://www.googleapis.com/auth/drive.readonly', 'openid'],  # Update this line
+        scopes=config['web']['scopes'],  # Read scopes from config.json
         state=state,
         redirect_uri='http://localhost:5000/google_drive_callback'  # Ensure this matches the Google Cloud Console
     )
@@ -161,6 +163,45 @@ def sync_google_drive(config_file=CONFIG_FILE_PATH):
             full_text = fh.read().decode('utf-8', errors='ignore')
         DocumentModel.add_document(file_name, full_text)
 
+def sync_folder(folder_id):
+    """
+    Sync the local 'documents' folder with the specified Google Drive folder.
+    
+    :param folder_id: The ID of the Google Drive folder to sync with.
+    """
+    with open(CONFIG_FILE_PATH, 'r') as f:
+        config = json.load(f)
+    
+    credentials_file = config['credentials_file']
+    
+    SCOPES = ['https://www.googleapis.com/auth/drive']
+    creds = service_account.Credentials.from_service_account_file(credentials_file, scopes=SCOPES)
+    service = build('drive', 'v3', credentials=creds)
+
+    local_folder = './documents'  # Path to the local folder to sync
+    for root, dirs, files in os.walk(local_folder):
+        for file_name in files:
+            file_path = os.path.join(root, file_name)
+            file_metadata = {
+                'name': file_name,
+                'parents': [folder_id]
+            }
+            media = MediaFileUpload(file_path, resumable=True)
+            service.files().create(body=file_metadata, media_body=media, fields='id').execute()
+
+@app.route('/sync_folder', methods=['POST'])
+@csrf.exempt
+def sync_folder_route():
+    data = request.get_json()
+    folder_id = data.get('folder_id')
+    if not folder_id:
+        return jsonify({'success': False, 'error': 'No folder ID provided'}), 400
+    try:
+        sync_folder(folder_id)
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -178,6 +219,4 @@ def select_folder_route():
     return select_folder()
 
 if __name__ == '__main__': 
-    app.run(debug=True)
-
     app.run(debug=True)

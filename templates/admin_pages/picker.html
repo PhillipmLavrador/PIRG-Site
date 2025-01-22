@@ -13,7 +13,7 @@
   var clientId = '{{ client_id }}';
 
   // Scope to use to access user's Drive items.
-  var scope = {{ scopes|tojson }};  // Read scopes from template context
+  var scope = {{ scopes|tojson }};  // Read scopes from template context 
 
   var pickerApiLoaded = false;
   var oauthToken;
@@ -29,7 +29,7 @@
       {
         'client_id': clientId,
         'scope': scope,
-        'immediate': false
+        'immediate': true
       },
       handleAuthResult);
   }
@@ -46,11 +46,12 @@
     }
   }
 
-  // Create and render a Picker object for selecting folders.
+  // Create and render a Picker object for selecting folders and uploading files.
   function createPicker() {
     if (pickerApiLoaded && oauthToken) {
       var picker = new google.picker.PickerBuilder()
           .addView(google.picker.ViewId.FOLDERS)
+          .addView(google.picker.ViewId.UPLOAD)  // Add upload view
           .setOAuthToken(oauthToken)
           .setDeveloperKey(developerKey)
           .setCallback(pickerCallback)
@@ -61,12 +62,30 @@
 
   // A simple callback implementation.
   function pickerCallback(data) {
-    var url = 'nothing';
     if (data[google.picker.Response.ACTION] == google.picker.Action.PICKED) {
       var doc = data[google.picker.Response.DOCUMENTS][0];
-      url = doc[google.picker.Document.URL];
-      alert('You picked: ' + url);
+      var folderId = doc[google.picker.Document.ID];
+      syncFolder(folderId);
     }
+  }
+
+  function syncFolder(folderId) {
+    fetch('/sync_folder', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': '{{ csrf_token }}'
+      },
+      body: JSON.stringify({ folder_id: folderId })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        alert('Folder synced successfully!');
+      } else {
+        alert('Error syncing folder: ' + data.error);
+      }
+    });
   }
 
   function loadPicker() {
