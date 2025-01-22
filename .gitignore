@@ -1,5 +1,5 @@
 # Ignore the config.json file
-config.json
+./config.json
 
 # Ignore other common files and directories
 __pycache__/
