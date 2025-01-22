@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Page{% endblock %}
+
+{% block content %}
+<div style="display: flex;">
+    <div id="sidebar" style="width: 200px; background-color: #007bff; padding: 10px; color: white; transition: width 0.3s; margin-left: 0;">
+        <h3 style="margin-top: 0; text-align: center;">Admin Menu</h3>
+        <ul style="list-style-type: none; padding: 0;">
+            <li style="margin: 10px 0;"><a href="{{ url_for('members') }}" style="color: white; text-decoration: none;">Members</a></li>
+            <li style="margin: 10px 0;"><a href="{{ url_for('doc_db') }}" style="color: white; text-decoration: none;">Document Database</a></li>
+        </ul>
+        <button onclick="toggleSidebar()" style="background-color: #0056b3; color: white; border: none; padding: 10px; cursor: pointer; width: 100%;">Toggle Menu</button>
+    </div>
+    <div style="flex-grow: 1; padding: 20px;">
+        <h2>Admin Page</h2>
+        <p>Welcome to the admin page. Only users with the "admin" role can see this page.</p>
+    </div>
+</div>
+<script>
+    function toggleSidebar() {
+        var sidebar = document.getElementById('sidebar');
+        if (sidebar.style.width === '200px') {
+            sidebar.style.width = '50px';
+        } else {
+            sidebar.style.width = '200px';
+        }
+    }
+</script>
+{% endblock %}

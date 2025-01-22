@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Google Drive Picker{% endblock %}
+
+{% block content %}
+<h2>Select a Google Drive Folder</h2>
+<button onclick="loadPicker()">Open Google Picker</button>
+<script type="text/javascript">
+  // The Developer Key obtained from the Google API Console.
+  var developerKey = '{{ developer_key }}';
+
+  // The Client ID obtained from the Google API Console. Replace with your own Client ID.
+  var clientId = '{{ client_id }}';
+
+  // Scope to use to access user's Drive items.
+  var scope = ['https://www.googleapis.com/auth/drive.readonly'];
+
+  var pickerApiLoaded = false;
+  var oauthToken;
+
+  // Use the API Loader script to load google.picker and gapi.auth.
+  function onApiLoad() {
+    gapi.load('auth', {'callback': onAuthApiLoad});
+    gapi.load('picker', {'callback': onPickerApiLoad});
+  }
+
+  function onAuthApiLoad() {
+    window.gapi.auth.authorize(
+      {
+        'client_id': clientId,
+        'scope': scope,
+        'immediate': false
+      },
+      handleAuthResult);
+  }
+
+  function onPickerApiLoad() {
+    pickerApiLoaded = true;
+    createPicker();
+  }
+
+  function handleAuthResult(authResult) {
+    if (authResult && !authResult.error) {
+      oauthToken = authResult.access_token;
+      createPicker();
+    }
+  }
+
+  // Create and render a Picker object for selecting folders.
+  function createPicker() {
+    if (pickerApiLoaded && oauthToken) {
+      var picker = new google.picker.PickerBuilder()
+          .addView(google.picker.ViewId.FOLDERS)
+          .setOAuthToken(oauthToken)
+          .setDeveloperKey(developerKey)
+          .setCallback(pickerCallback)
+          .build();
+      picker.setVisible(true);
+    }
+  }
+
+  // A simple callback implementation.
+  function pickerCallback(data) {
+    var url = 'nothing';
+    if (data[google.picker.Response.ACTION] == google.picker.Action.PICKED) {
+      var doc = data[google.picker.Response.DOCUMENTS][0];
+      url = doc[google.picker.Document.URL];
+      alert('You picked: ' + url);
+    }
+  }
+
+  function loadPicker() {
+    onApiLoad();
+  }
+</script>
+<script type="text/javascript" src="https://apis.google.com/js/api.js?onload=onApiLoad"></script>
+{% endblock %}

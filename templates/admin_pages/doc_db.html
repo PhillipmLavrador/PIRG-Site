@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Document Database{% endblock %}
+
+{% block content %}
+<h2>Document Database</h2>
+<button onclick="syncFiles()" style="background-color: #007bff; color: white; border: none; padding: 10px; cursor: pointer;">Sync Files</button>
+<button onclick="authenticateGoogleDrive()" style="background-color: #007bff; color: white; border: none; padding: 10px; cursor: pointer;">Add Google Drive Folder</button>
+<table>
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Content</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for document in documents %}
+        <tr>
+            <td>{{ document[0] }}</td>
+            <td>{{ document[1] }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<script>
+    function syncFiles() {
+        fetch('/sync_files', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            if (response.ok) {
+                alert('Files synced successfully');
+                location.reload();
+            } else {
+                alert('Failed to sync files');
+            }
+        });
+    }
+
+    function authenticateGoogleDrive() {
+        window.location.href = '/google_drive_auth';
+    }
+</script>
+{% endblock %}

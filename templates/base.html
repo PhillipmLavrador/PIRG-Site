@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}{% endblock %}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .banner {
+            background-color: #007bff;
+            padding: 10px;
+            text-align: center;
+            border-bottom: 1px solid #0056b3;
+            position: relative;
+        }
+        .banner a {
+            margin: 0 10px;
+            text-decoration: none;
+            color: #ffffff;
+            font-weight: bold;
+        }
+        .banner .close-btn {
+            float: right;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .banner .greeting {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: #ffffff;
+            font-weight: bold;
+        }
+        .error-banner {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            text-align: center;
+            border-bottom: 1px solid #f5c6cb;
+        }
+        .error-banner .close-btn {
+            float: right;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .content {
+            padding: 20px;
+        }
+        h2 {
+            color: #007bff;
+        }
+        form {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="email"], input[type="password"], input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        input[type="submit"] {
+            background-color: #007bff;
+            color: #ffffff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+        .dataframe {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            font-family: 'Arial', sans-serif;
+            font-size: 14px;
+        }
+        .dataframe th, .dataframe td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .dataframe th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        .dataframe tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .dataframe tr:hover {
+            background-color: #ddd;
+        }
+        .dataframe td {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .file-content {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        .file-content p {
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="banner" id="banner">
+        <a href="{{ url_for('home') }}">Home</a>
+        <a href="{{ url_for('files') }}">Files</a>
+        {% if 'user' in session %}
+            {% if can_access_admin_page %}
+                <a href="{{ url_for('admin') }}">Admin Page</a>
+            {% endif %}
+            <a href="{{ url_for('logout') }}">Sign Out</a>
+            <span class="greeting">Hi {{ session['first_name'] }}!</span>
+        {% else %}
+            <a href="{{ url_for('login') }}">Login</a>
+        {% endif %}
+    </div>
+    <script>
+        function closeBanner() {
+            document.getElementById('banner').style.display = 'none';
+        }
+        function closeErrorBanner() {
+            document.getElementById('error-banner').style.display = 'none';
+        }
+    </script>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                {% if category == 'error' %}
+                    <div class="error-banner" id="error-banner">
+                        <span class="close-btn" onclick="closeErrorBanner()">x</span>
+                        {{ message }}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <div class="content">
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

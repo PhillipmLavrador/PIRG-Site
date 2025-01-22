@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block title %}File Content{% endblock %}
+
+{% block content %}
+<div class="file-content">
+    {{ content|safe }}
+</div>
+{% endblock %}

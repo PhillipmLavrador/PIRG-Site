@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Select Google Drive Folder{% endblock %}
+
+{% block content %}
+<h2>Select Google Drive Folder</h2>
+<form method="POST" action="{{ url_for('select_folder_route') }}">
+    <label for="folder_id">Choose a folder:</label>
+    <select name="folder_id" id="folder_id">
+        {% for folder in folders %}
+        <option value="{{ folder.id }}">{{ folder.name }}</option>
+        {% endfor %}
+    </select>
+    <button type="submit" style="background-color: #007bff; color: white; border: none; padding: 10px; cursor: pointer;">Select Folder</button>
+</form>
+{% endblock %}

@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}Members{% endblock %}
+
+{% block content %}
+<h2>Members</h2>
+<table>
+    <thead>
+        <tr>
+            <th></th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Email</th>
+            <th>Roles</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for member in members %}
+        <tr>
+            <td>
+                {% if is_admin or is_organizer %}
+                <button onclick="confirmDelete('{{ member[0] }}')" style="background-color: red; color: white; border: none; cursor: pointer;">x</button>
+                {% endif %}
+            </td>
+            <td>{{ member[1] }}</td>
+            <td>{{ member[2] }}</td>
+            <td>{{ member[0] }}</td>
+            <td>
+                <div class="dropdown">
+                    <button class="dropbtn">Roles</button>
+                    <div class="dropdown-content">
+                        <label><input type="checkbox" value="member" {% if 'member' in member[3] %}checked{% endif %} {% if not perms['can_assign_gen_roles'] %}disabled{% endif %} onchange="updateRoles('{{ member[0] }}', this)"> Member</label>
+                        <label><input type="checkbox" value="Admin" {% if 'Admin' in member[3] %}checked{% endif %} {% if not perms['can_assign_admin'] %}disabled{% endif %} onchange="updateRoles('{{ member[0] }}', this)"> Admin</label>
+                        <label><input type="checkbox" value="Organizer" {% if 'Organizer' in member[3] %}checked{% endif %} {% if not perms['can_assign_organizer'] %}disabled{% endif %} onchange="updateRoles('{{ member[0] }}', this)"> Organizer</label>
+                        <label><input type="checkbox" value="Campaign Coordinator" {% if 'Campaign Coordinator' in member[3] %}checked{% endif %} {% if not perms['can_assign_gen_roles'] %}disabled{% endif %} onchange="updateRoles('{{ member[0] }}', this)"> Campaign Coordinator</label>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<script>
+    function updateRoles(email, checkboxElement) {
+        const role = checkboxElement.value;
+        const isChecked = checkboxElement.checked;
+        fetch('/update_roles', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email: email, role: role, is_checked: isChecked })
+        });
+    }
+
+    function confirmDelete(email) {
+        if (confirm('Are you sure you want to delete this user?')) {
+            deleteUser(email);
+        }
+    }
+
+    function deleteUser(email) {
+        fetch('/delete_user', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email: email })
+        }).then(response => {
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('Failed to delete user');
+            }
+        });
+    }
+</script>
+<style>
+    .dropdown {
+        position: relative;
+        display: inline-block;
+    }
+
+    .dropbtn {
+        background-color: #4CAF50;
+        color: white;
+        padding: 10px;
+        font-size: 16px;
+        border: none;
+        cursor: pointer;
+        border-radius: 4px;
+    }
+
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: #f9f9f9;
+        min-width: 200px;
+        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+        z-index: 1;
+        border-radius: 4px;
+    }
+
+    .dropdown-content label {
+        color: black;
+        padding: 12px 16px;
+        text-decoration: none;
+        display: block;
+        cursor: pointer;
+    }
+
+    .dropdown-content label:hover {
+        background-color: #f1f1f1;
+    }
+
+    .dropdown:hover .dropdown-content {
+        display: block;
+    }
+
+    .dropdown:hover .dropbtn {
+        background-color: #3e8e41;
+    }
+</style>
+{% endblock %}

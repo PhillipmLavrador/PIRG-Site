@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Sign Up{% endblock %}
+
+{% block content %}
+<h2>Sign Up</h2>
+<form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label for="first_name">First Name:</label>
+    <input type="text" id="first_name" name="first_name"><br>
+    <label for="last_name">Last Name:</label>
+    <input type="text" id="last_name" name="last_name"><br>
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email"><br>
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password"><br>
+    <label for="confirm_password">Confirm Password:</label>
+    <input type="password" id="confirm_password" name="confirm_password"><br>
+    <input type="submit" value="Sign Up">
+</form>
+<br>
+<form action="{{ url_for('login') }}">
+    <input type="submit" value="Back to Login">
+</form>
+{% endblock %}
