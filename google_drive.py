@@ -22,7 +22,7 @@ def google_drive_auth():
     flow = Flow.from_client_config(
         config,
         scopes=['https://www.googleapis.com/auth/drive.readonly'],
-        redirect_uri='http://localhost:9090/google_drive_callback'  # Update this line
+        redirect_uri='http://localhost:5000/google_drive_callback'  # Ensure this matches the Google Cloud Console
     )
     authorization_url, state = flow.authorization_url(access_type='offline', include_granted_scopes='true', prompt='consent')
     session['state'] = state
@@ -36,7 +36,7 @@ def google_drive_callback():
         config,
         scopes=['https://www.googleapis.com/auth/drive.readonly'],
         state=state,
-        redirect_uri='http://localhost:9090/google_drive_callback'  # Update this line
+        redirect_uri='http://localhost:5000/google_drive_callback'  # Ensure this matches the Google Cloud Console
     )
     flow.fetch_token(authorization_response=request.url)
     credentials = flow.credentials

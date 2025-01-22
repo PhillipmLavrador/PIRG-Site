@@ -1,13 +1,17 @@
 {
     "web": {
-        "client_id": "641434574610-aubj068h0hko879hrurkf07r83igqb8m.apps.googleusercontent.com",
+        "client_id": "641434574610-8iope0havfe4bi1fj036s3d8ni9m553i.apps.googleusercontent.com",
         "project_id": "pirg-site",
         "auth_uri": "https://accounts.google.com/o/oauth2/auth",
         "token_uri": "https://oauth2.googleapis.com/token",
         "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-        "client_secret": "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",
-        "redirect_uris": ["http://localhost:9090/google_drive_callback"],
-        "javascript_origins": ["http://localhost:9090"],
+        "client_secret": "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",
+        "redirect_uris": [
+            "http://localhost:5000/google_drive_callback"
+        ],
+        "javascript_origins": [
+            "http://localhost:5000"
+        ],
         "developer_key": "AIzaSyBXwHqsSbnXD5vtA7wIg-3t4mHdQOupGng"
     }
 }
